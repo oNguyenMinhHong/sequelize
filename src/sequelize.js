@@ -361,6 +361,9 @@ class Sequelize {
       case 'snowflake':
         Dialect = require('./dialects/snowflake');
         break;
+      case 'clickhouse': 
+        Dialect = require('./dialects/clickhouse');
+        break;
       default:
         throw new Error(`The dialect ${this.getDialect()} is not supported. Supported dialects: mssql, mariadb, mysql, oracle, postgres, db2 and sqlite.`);
     }
@@ -1337,7 +1340,6 @@ class Sequelize {
       } else {
         attribute.values = attribute.type.values;
       }
-
       if (!attribute.values.length) {
         throw new Error('Values for ENUM have not been defined.');
       }

@@ -153,7 +153,7 @@ class Model {
 
       if (this.constructor._hasDefaultValues) {
         defaults = _.mapValues(this.constructor._defaultValues, valueFn => {
-          const value = valueFn();
+          const value = valueFn?.();
           return value && value instanceof Utils.SequelizeMethod ? value : _.cloneDeep(value);
         });
       }
@@ -1217,9 +1217,16 @@ class Model {
       } else if (definition.type instanceof DataTypes.VIRTUAL) {
         this._virtualAttributes.add(name);
       }
-
       if (Object.prototype.hasOwnProperty.call(definition, 'defaultValue')) {
         this._defaultValues[name] = () => Utils.toDefaultValue(definition.defaultValue, this.sequelize.options.dialect);
+      } else if (this.sequelize.options.dialect === 'clickhouse') {
+        if (definition.allowNull === false) {
+          this._defaultValues[name] = definition.type.getDefaultValue;
+        } else if (definition.type instanceof DataTypes.ARRAY) {
+          this._defaultValues[name] = () => [];
+        } else {
+          this._defaultValues[name] = () => null;
+        }
       }
 
       if (Object.prototype.hasOwnProperty.call(definition, 'unique') && definition.unique) {
@@ -1409,6 +1416,8 @@ class Model {
         }
       }
     }
+
+    if (this.sequelize.options.dialect === 'clickhouse') return this;
 
     const existingIndexes = await this.queryInterface.showIndex(tableName, options);
     const missingIndexes = this._indexes.filter(item1 =>

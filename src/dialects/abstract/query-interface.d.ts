@@ -151,7 +151,7 @@ export interface TableNameWithSchema {
 }
 export type TableName = string | TableNameWithSchema;
 
-export type IndexType = 'UNIQUE' | 'FULLTEXT' | 'SPATIAL';
+export type IndexType = 'UNIQUE' | 'FULLTEXT' | 'SPATIAL' | 'inverted' | 'hypothesis' | 'bloom_filter' | 'tokenbf_v1' | 'ngrambf_v1' | 'set' | 'minmax';
 export type IndexMethod = 'BTREE' | 'HASH' | 'GIST' | 'SPGIST' | 'GIN' | 'BRIN' | string;
 
 export interface IndexesOptions {
